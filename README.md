@@ -5,7 +5,7 @@
 <h1 align="center">anu</h1>
 
 <p align="center">
-  A Claude Code plugin that takes an idea to merged code in any Tulifo app.
+  A Claude Code plugin that takes an idea to merged code in any app.
 </p>
 
 <p align="center">

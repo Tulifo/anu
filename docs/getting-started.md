@@ -53,7 +53,7 @@ What happens:
    check commands from scripts and CI, the local stack from dev scripts and docker-compose, a dev
    sign-in route, breakpoints, themes, the styles file.
 3. It asks you, in one message, only what it could not find. Usually that is the **task prefix**
-   (for example `CS` for compass-saas) and the **design references** (apps or screens sketches
+   (for example `CS` for a repo named `customer-site`) and the **design references** (apps or screens sketches
    should look like).
 4. It writes the `## anu` section into CLAUDE.md, creates `docs/briefs/`, `docs/sketches/`,
    `docs/tasks/`, `docs/work-notes/`, `docs/todo.md` and `LESSONS.md`, adds `.claude/worktrees/`
