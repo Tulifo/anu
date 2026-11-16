@@ -22,10 +22,11 @@ work already started: a worktree or branch `design/<feature>`, or a brief
 `docs/briefs/*-<feature>.md` on `origin/main`. If found, say what exists and carry on from the
 first missing step.
 
-Otherwise make the worktree: `git worktree add -b design/<feature> .claude/worktrees/design-<feature> origin/main`
-(or, if this session already runs in a worktree with no commits beyond `origin/main`, rename its
-branch with `git branch -m design/<feature>`). Never switch branches in the main checkout; never
-commit to main.
+Otherwise, reuse this session's worktree only if it is a linked worktree — `.git` at its root is a file, not a
+folder (`test -f "$(git rev-parse --show-toplevel)/.git"`) — with no commits
+beyond `origin/main` and nothing uncommitted; then rename its branch: `git branch -m design/<feature>`. If it does
+not pass, make one: `git worktree add -b design/<feature> .claude/worktrees/design-<feature> origin/main`.
+Never rename or switch the main checkout's branch; never commit to main.
 
 Everything this command writes is committed on `design/<feature>` and goes up as one PR.
 

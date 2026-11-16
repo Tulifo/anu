@@ -13,8 +13,8 @@ Task: $ARGUMENTS
 Read `## anu` in the repo's CLAUDE.md; missing → stop: "Run /anu:setup first." Find the task's
 worktree and state.json by exact ID and work there.
 
-The normal start is `stage: "planned"`. Stage `studied` → run /anu:plan first (it stops for the
-OK), then carry on. Stage `made` or later → say so and ask: rework, or go on to /anu:submit.
+The normal start is `stage: "planned"`. Stage `studied` → run /anu:plan first, then carry on.
+Stage `made` or later → say so and ask: rework, or go on to /anu:submit.
 
 Read the task, `study.md`, `plan.md`, the `LESSONS.md` entries `study.md` lists, and the sketch
 screenshots in `docs/work-notes/<ID>/shots/`.
@@ -28,8 +28,9 @@ screenshots in `docs/work-notes/<ID>/shots/`.
   Validate input at the edge. No secrets in client code or commits.
 - Screen: only the app's tokens and components and the icons from `## anu`, with real loading,
   empty and error states.
-- A gap the plan does not cover: if it changes what a user sees or what data is exposed, stop and
-  ask. Otherwise decide, and add it to `plan.md` under `## Decisions taken`.
+- A gap the plan does not cover: decide without stopping — the brief's default, else the smallest
+  choice that exposes no more data than the brief allows — and add it to `plan.md` under
+  `## Decisions taken`.
 - Do not pause after each part. Do not commit; /anu:submit commits.
 
 ## 2. Check

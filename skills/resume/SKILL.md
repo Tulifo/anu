@@ -48,7 +48,7 @@ Next: make
 | Last finished (`stage`) | Run next |
 |---|---|
 | `null` | /anu:study, then onward |
-| `studied` | /anu:plan (stops for the OK) |
+| `studied` | /anu:plan, then onward |
 | `planned` | /anu:make — or /anu:build for the team, which needs `claude --agent anu:tech-lead` |
 | `made` | /anu:submit |
 | `submitted` | show each PR's state and review comments; fix what reviewers asked, run the checks, commit, push, and reply on the PR |

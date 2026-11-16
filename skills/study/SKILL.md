@@ -36,10 +36,10 @@ stop, name the blocker and its PR state, and go on only if the user says so.
 
 ## 4. Make the worktree
 
-Branch `task/<ID>-<slug>` (the slug from the task file name). If this session already runs in a
-worktree whose branch has no commits beyond `origin/main`, rename it: `git branch -m task/<ID>-<slug>`.
+Branch `task/<ID>-<slug>` (the slug from the task file name). Reuse this session's worktree only if it is a linked worktree — `.git` at its root is a file, not a
+folder (`test -f "$(git rev-parse --show-toplevel)/.git"`) — with no commits beyond `origin/main` and nothing uncommitted; then rename its branch: `git branch -m task/<ID>-<slug>`.
 Otherwise `git worktree add -b task/<ID>-<slug> .claude/worktrees/<ID> origin/main` and work
-there. Never switch branches in the main checkout; never commit to main.
+there. Never rename or switch the main checkout's branch; never commit to main.
 
 Write `docs/work-notes/<ID>/state.json`:
 
@@ -70,7 +70,8 @@ Write `docs/work-notes/<ID>/state.json`:
 - If the task says a layer needs no change, check that against the sketch: does the server
   already return everything the screen shows?
 
-Ask the user only what changes the approach. Decide the rest and note it.
+Do not stop to ask: decide, and note each call under `## Decisions taken`. The only stops here
+are an unmerged blocker (step 3) and a task whose design PR is not merged (step 1).
 
 ## 6. Write study.md
 
