@@ -1,6 +1,6 @@
 # anu documentation
 
-anu is a Claude Code plugin that takes an idea to merged code in any Tulifo app. It holds the
+anu is a Claude Code plugin that takes an idea to merged code in any app. It holds the
 process only: how an idea becomes a brief, sketches and tasks, and how a task becomes a reviewed
 pull request. Each app keeps its own facts (stack, checks, ports, dev sign-in, screen sizes,
 styles) in a `## anu` section of its CLAUDE.md.

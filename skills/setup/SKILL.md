@@ -35,7 +35,7 @@ Find each fact yourself first:
 | Other repos | README, CLAUDE.md, workspace files: repos a task here may also change |
 
 Then ask, in one message, only what you could not find. The task prefix (suggest one from the
-repo name, e.g. `CS` for compass-saas) and the design references (apps, screens or files sketches
+repo name, e.g. `CS` for a repo named `customer-site`) and the design references (apps, screens or files sketches
 should match) usually need asking.
 
 No dev sign-in route? Write `none yet` and tell the user QA needs one: a route the server opens
