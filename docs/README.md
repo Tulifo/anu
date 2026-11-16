@@ -20,15 +20,20 @@ styles) in a `## anu` section of its CLAUDE.md.
 ## In one picture
 
 ```mermaid
-flowchart LR
-    I["/anu:idea"] --> B["brief"] --> S["sketches"] --> T["tasks"]
-    T --> DPR(["design PR: you merge"])
-    DPR --> BU["/anu:build CS-14"]
-    BU --> ST["study"] --> PL["plan"] --> MK["two devs build"]
-    MK --> QA["QA in the running app"]
-    MK --> SEC["security review"]
-    QA --> PR(["task PR: you merge"])
-    SEC --> PR
+flowchart TD
+    subgraph Design
+        direction LR
+        I["/anu:idea"] --> B["brief"] --> S["sketches"] --> T["tasks"] --> DPR(["design PR: you merge"])
+    end
+    subgraph Build
+        direction LR
+        BU["/anu:build CS-14"] --> ST["study"] --> PL["plan"] --> MK["two devs build"]
+        MK --> QA["QA in the running app"]
+        MK --> SEC["security review"]
+        QA --> PR(["task PR: you merge"])
+        SEC --> PR
+    end
+    Design --> Build
 ```
 
 You approve the design (approach, brief, each sketch, task list) and you merge the PRs. Between
