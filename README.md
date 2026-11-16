@@ -45,9 +45,9 @@ claude --agent anu:tech-lead
 /anu:build CS-14
 ```
 
-One task → finished code, ready for your review. The tech lead plans it and stops for your OK;
-two senior devs build it; QA checks it in the running app; security reviews the diff; the lead
-opens the PR. You merge.
+One task → finished code, ready for your review, with no stop until the PR. The tech lead plans
+it; two senior devs build it; QA checks it in the running app; security reviews the diff; the
+lead opens the PR. You merge.
 
 ## Commands
 
@@ -68,7 +68,8 @@ opens the PR. You merge.
 | `/anu:setup` | prepare an app repo to use anu (once per app) |
 
 To build a task alone instead of with the team: `/anu:study` → `/anu:plan` → `/anu:make` →
-`/anu:submit`.
+`/anu:submit`. Alone, `/anu:submit` still has the read-only QA and security agents check the
+work before it opens the PR.
 
 ## What anu writes in an app repo
 

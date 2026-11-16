@@ -1,6 +1,6 @@
 ---
 name: build
-description: Take one task to finished code ready for review with the agent team — the tech lead studies and plans it (stops for the user's OK), two senior devs build two slices, QA checks it in the running app, security reviews the diff, and the lead opens the PR. Use for /anu:build CS-14, in a session started with `claude --agent anu:tech-lead`.
+description: Take one task to finished code ready for review with the agent team, without stopping until the PR — the tech lead studies and plans it, two senior devs build two slices, QA checks it in the running app, security reviews the diff, and the lead opens the PR. Use for /anu:build CS-14, in a session started with `claude --agent anu:tech-lead`.
 argument-hint: "<task ID>"
 ---
 
@@ -22,7 +22,7 @@ Task: $ARGUMENTS
 Find the task and its state.json by exact ID, and carry on from `stage`:
 - `null` → /anu:study (checks the blockers are merged, makes the worktree), then plan.
 - `studied` → /anu:plan. The plan needs two slices with no file in common and the shared
-  interfaces written out. It stops for the user's OK.
+  interfaces written out. Do not wait for an OK: go straight on to step 2.
 - `planned` → step 2. `made` → step 5. `submitted` → hand over to /anu:resume.
 
 ## 2. Start the local stack
@@ -64,14 +64,14 @@ Teammates do not see this conversation. Every spawn prompt carries:
 - A teammate silent for 10 minutes gets a ping; still silent → do its remaining check yourself
   and say so in the PR.
 - Post one short status line to the user when a shared task changes state.
-- No stop between the plan OK and the PR: decide, and add each call to `plan.md` under
-  `## Decisions taken`.
+- No stop between `/anu:build` and the PR: decide, and add each call to `plan.md` under
+  `## Decisions taken`. The user reviews in the PR.
 
 ## 5. Land it
 
-When `qa` and `security` pass, set `stage: "made"` and run /anu:submit. In the PR body, next to
-`## Decisions taken`, add `## Slices` (who built what), `## QA` (what was verified, sizes,
-themes) and `## Security` (findings and their status).
+When `qa` and `security` pass, set `stage: "made"` and run /anu:submit; it uses their reports
+for the PR's `## Acceptance` and `## Security`. Add `## Slices` (who built what) next to
+`## Decisions taken`.
 
 ## 6. Close
 

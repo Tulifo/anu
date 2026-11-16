@@ -11,10 +11,13 @@ Start from: $ARGUMENTS (a bug just fixed, a file, an area — or nothing, to fin
 ## Before you start
 
 Read `## anu` in the repo's CLAUDE.md; missing → stop: "Run /anu:setup first." Read `LESSONS.md`
-so no lesson is recorded twice. `git fetch origin`, then work in a worktree on
-`lessons/YYYY-MM-DD` off `origin/main`:
-`git worktree add -b lessons/YYYY-MM-DD .claude/worktrees/lessons origin/main` (or rename a fresh
-session worktree's branch with `git branch -m`). Never on main.
+so no lesson is recorded twice. `git fetch origin`, and pick a short kebab-case topic (the bug,
+file or area). Reuse this session's worktree only if it is a linked worktree — `.git` at its root is a file, not a
+folder (`test -f "$(git rev-parse --show-toplevel)/.git"`) — with no commits
+beyond `origin/main` and nothing uncommitted; then rename
+its branch: `git branch -m lessons/<topic>`. Otherwise
+`git worktree add -b lessons/<topic> .claude/worktrees/lessons-<topic> origin/main`; if that
+branch exists, add `-2`. Never rename or switch the main checkout's branch; never commit to main.
 
 ## 1. Find where the lessons are
 
@@ -64,7 +67,7 @@ Show every lesson and follow-up and apply the user's edits. Append lessons to `L
 edit or delete an existing one without asking — and follow-ups to `docs/todo.md`.
 
 `git status --short`, then `git add` only files that exist and changed. Commit "Lessons: <n>
-added" under the user's own git identity, with no AI trailer. `git push -u origin lessons/YYYY-MM-DD`.
+added" under the user's own git identity, with no AI trailer. `git push -u origin lessons/<topic>`.
 Write the PR body to a temp file and run `gh pr create --title "Lessons: <topic>" --body-file <file>`.
 Never merge.
 

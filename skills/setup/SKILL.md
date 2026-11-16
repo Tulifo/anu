@@ -10,10 +10,11 @@ This writes that section and the files the other commands use.
 
 ## 1. Work in a worktree
 
-Run inside the app repo. `git fetch origin`. If this session already runs in a worktree whose
-branch has no commits beyond `origin/main`, rename its branch: `git branch -m anu/setup`.
+Run inside the app repo. `git fetch origin`. Reuse this session's worktree only if it is a linked worktree — `.git` at its root is a file, not a
+folder (`test -f "$(git rev-parse --show-toplevel)/.git"`) — with no commits
+beyond `origin/main` and nothing uncommitted; then rename its branch: `git branch -m anu/setup`.
 Otherwise `git worktree add -b anu/setup .claude/worktrees/anu-setup origin/main` and work there.
-Never switch branches in the main checkout; never commit to main.
+Never rename or switch the main checkout's branch; never commit to main.
 
 If CLAUDE.md on `origin/main` already has `## anu`, show it and ask what to change instead of
 starting over.

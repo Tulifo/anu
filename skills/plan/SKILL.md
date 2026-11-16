@@ -1,6 +1,6 @@
 ---
 name: plan
-description: List the changes a task needs, file by file and in order, split them into two slices with separate files and the interfaces they share, and say how each acceptance line will be checked; stops for the user's OK. Writes docs/work-notes/<ID>/plan.md. Use for /anu:plan CS-14, or inside /anu:build.
+description: List the changes a task needs, file by file and in order, split them into two slices with separate files and the interfaces they share, and say how each acceptance line will be checked — then carry on without waiting for an OK. Writes docs/work-notes/<ID>/plan.md. Use for /anu:plan CS-14, or inside /anu:build.
 argument-hint: "<task ID>"
 ---
 
@@ -15,8 +15,8 @@ worktree and `docs/work-notes/<ID>/state.json` by exact ID (as in /anu:study ste
 there.
 
 The normal start is `stage: "studied"`. Stage `null` → run /anu:study first, then carry on here;
-never send the user back a step. Stage `planned` or later → show the plan and ask: redo it, or go
-on to the next step.
+never send the user back a step. Stage `planned` or later → redo the plan only when the user ran
+/anu:plan to redo it; inside /anu:build or /anu:resume, go on to the next step.
 
 ## 1. Write the plan
 
@@ -64,12 +64,14 @@ component's defaults (width, padding, size).
 A small task may have one slice; say why. A screen with no sketch file under `docs/sketches/` is
 not designed: stop and say so; never plan its look from prose alone.
 
-## 2. OK the plan — stop
+## 2. Show it and carry on
 
-Show the plan and apply changes until the user says OK. After this, the work runs to the PR
-without stopping.
+Show the plan in a few lines — the slices, the shared interfaces, what is out — and do not wait
+for an OK. The design was agreed before the task was written; the user reviews the result in the
+PR. Anything the plan had to decide goes under `## Decisions taken`, which the PR lists.
 
 ## 3. Finish
 
 Set `stage: "planned"` and `updated`. `git add docs/work-notes/<ID>/` and commit "<ID>: plan".
-Next: /anu:make <ID> to build alone, or /anu:build <ID> with the team.
+Next: /anu:make <ID> to build alone, or /anu:build <ID> with the team (inside /anu:build it runs
+on its own).

@@ -31,8 +31,8 @@ the teammate owns, the shared interfaces, the `## anu` facts it needs, and who i
 2. **Plan** (`/anu:plan`): two slices with no file in common, usually screen (`dev-a`) and server
    and data (`dev-b`). A shared file (a router, an index, package.json) belongs to one dev; the
    other asks. Write the shared interfaces down before spawning — endpoint or function names,
-   inputs, outputs, errors, data fields — and put them in both spawn prompts verbatim. The plan
-   stops for the user's OK.
+   inputs, outputs, errors, data fields — and put them in both spawn prompts verbatim. Do not
+   wait for an OK on the plan.
 3. **Build and gate**: a slice is done only when its dev reports the checks green, `qa` has
    verified it in the running app, and `security` has cleared its diff. Send defects back to the
    owning dev by name; do not fix them yourself.
@@ -50,7 +50,7 @@ the teammate owns, the shared interfaces, the `## anu` facts it needs, and who i
 
 - Build only what the task and its brief allow. What they leave out is not built, even if a
   sketch draws it.
-- The user's stops are the plan OK and the PR merge. Between them, never stop to ask: take the
+- The user's only stop in a build is the PR merge. Never stop to ask mid-build: take the
   brief's default, else the smallest choice inside the repo, and list it under "Decisions taken"
   in the PR. Stop only for something destructive or outside the local stack (a real third-party
   service, a deploy, production data, billing).
