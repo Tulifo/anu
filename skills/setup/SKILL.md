@@ -1,0 +1,109 @@
+---
+name: setup
+description: Prepare an app repo to use anu, once per app. Fills the `## anu` section of CLAUDE.md, creates the docs folders, todo.md and LESSONS.md, turns anu on in .claude/settings.json, offers to remove the repo's own copies of what anu replaces, and opens a PR. Use for /anu:setup, or when another anu command says "Run /anu:setup first".
+---
+
+# /anu:setup — prepare an app repo
+
+anu holds the process; each app keeps its own facts in the `## anu` section of its CLAUDE.md.
+This writes that section and the files the other commands use.
+
+## 1. Work in a worktree
+
+Run inside the app repo. `git fetch origin`. If this session already runs in a worktree whose
+branch has no commits beyond `origin/main`, rename its branch: `git branch -m anu/setup`.
+Otherwise `git worktree add -b anu/setup .claude/worktrees/anu-setup origin/main` and work there.
+Never switch branches in the main checkout; never commit to main.
+
+If CLAUDE.md on `origin/main` already has `## anu`, show it and ask what to change instead of
+starting over.
+
+## 2. Read the repo, then ask only what is missing
+
+Find each fact yourself first:
+
+| Fact | Where to look |
+|---|---|
+| Stack | package.json, pyproject.toml, go.mod, Cargo.toml, Dockerfile, README |
+| Checks | package.json scripts, Makefile, `.github/workflows/`: type check, lint, tests |
+| Local stack | dev scripts, docker-compose, emulator config, `.env.example`: start command, app URL, every port |
+| Dev sign-in | grep the routes for `dev/login`, `dev-login`, `devLogin`, `?as=` |
+| Screen sizes | Playwright config, breakpoints in the styles (default `390x844, 1280x800`) |
+| Themes | `.dark`, `data-theme`, `prefers-color-scheme` in the styles |
+| Styles | the file that defines the tokens (`:root { --…`), the component folder, the icon package |
+| Other repos | README, CLAUDE.md, workspace files: repos a task here may also change |
+
+Then ask, in one message, only what you could not find. The task prefix (suggest one from the
+repo name, e.g. `CS` for compass-saas) and the design references (apps, screens or files sketches
+should match) usually need asking.
+
+No dev sign-in route? Write `none yet` and tell the user QA needs one: a route the server opens
+only outside production, checked in the handler itself, with no env flag or setting that can
+open it on a deployed host.
+
+## 3. Write the `## anu` section
+
+Add it to CLAUDE.md (create the file if missing; replace an old `## anu` section). Keep the keys
+and their order — every anu skill reads them by name:
+
+```markdown
+## anu
+
+- Stack: <languages, frameworks, database, hosting>
+- Checks: `<command>`, `<command>`
+- Local stack: `<start command>`; app http://localhost:<port>; <service> :<port>
+- Dev sign-in: http://localhost:<port>/<route>?as=<user>&next=<path> (users: <seeded users>)
+- Screen sizes: 390x844, 1280x800
+- Themes: light, dark (switch: <class or attribute on html>)
+- Styles: `<tokens file>`; components: `<folder>`; icons: <package> (`<path to its SVG data>`)
+- Task prefix: CS
+- Design references: <apps, screens or files>
+- Other repos: <name and local path> | none
+```
+
+## 4. Folders and files
+
+Create what is missing:
+- `docs/briefs/`, `docs/sketches/`, `docs/tasks/`, `docs/work-notes/`, each with an empty `.gitkeep`.
+- `docs/todo.md`:
+  ```markdown
+  # To do
+
+  Next: CS-1
+
+  ## Coming
+
+  ## Follow-ups
+  ```
+- `LESSONS.md` at the repo root: a `# Lessons` heading and the line "What broke before and must
+  not break again. Add with /anu:lessons."
+- `.gitignore`: add `.claude/worktrees/`.
+
+## 5. Turn anu on for everyone who opens the repo
+
+Merge into `.claude/settings.json`, keeping every existing key:
+
+```json
+{
+  "extraKnownMarketplaces": { "anu": { "source": { "source": "github", "repo": "Tulifo/anu" } } },
+  "enabledPlugins": { "anu@anu": true }
+}
+```
+
+## 6. Offer to remove what anu replaces
+
+List the repo's own `.claude/agents/` and `.claude/skills/` that do anu's job (a tech lead,
+senior dev, QA or security agent; a build, brief, sketch, task, plan or submit skill). Show the
+list and ask before deleting anything. Before a file goes, move any app fact it holds that
+`## anu` lacks (ports, roles, test users, what is out of scope) into CLAUDE.md. Delete with
+`git rm` on this branch only.
+
+## 7. Commit and open the PR
+
+`git add` only the files you created or changed. Commit under the user's own git identity (if
+`git config user.name` is empty, ask for the name once and pass `-c user.name=… -c user.email=…`);
+no AI co-author trailer or footer. `git push -u origin anu/setup`. Write the PR body to a temp
+file and run `gh pr create --title "Set up anu" --body-file <file>` — never `--body` with
+backticks. Never merge.
+
+Report the PR link and the two daily commands: `/anu:idea "<idea>"` and `/anu:build <PREFIX>-1`.

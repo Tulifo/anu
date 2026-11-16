@@ -1,0 +1,11 @@
+{
+  "name": "anu",
+  "owner": { "name": "Arun" },
+  "plugins": [
+    {
+      "name": "anu",
+      "source": "./",
+      "description": "Idea to merged code for Tulifo apps: brief, sketches and tasks, then an agent team that builds, checks and submits each task."
+    }
+  ]
+}
