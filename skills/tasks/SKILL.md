@@ -10,8 +10,8 @@ Input: $ARGUMENTS (a feature name or brief path; default: the brief on the curre
 
 ## Before you start
 
-Read `## anu` in the repo's CLAUDE.md; missing → stop: "Run /anu:setup first." Work in the
-feature's `design/<feature>` worktree, never on main. Read the brief, `screens.md` and every
+Read `## anu` in the repo's CLAUDE.md; missing → stop: "Run /anu:setup first." `<base>` below is its `Base branch` (`main` if the key is absent).
+Work in the feature's `design/<feature>` worktree, never on `<base>`. Read the brief, `screens.md` and every
 sketch file.
 
 ## 1. Draft the tasks
@@ -35,7 +35,7 @@ split, merge or change any. Wait for an OK.
 
 ## 3. Reserve the IDs — the `Next:` line first
 
-`git fetch origin`, then rebase the design branch onto `origin/main` so `docs/todo.md` is
+`git fetch origin`, then rebase the design branch onto `origin/<base>` so `docs/todo.md` is
 current. Read `Next: <PREFIX>-<n>`. The new tasks take `<n>`, `<n+1>`, … in the agreed order;
 never take an ID from file names. Edit the `Next:` line to the first unused ID, add each task to
 `## Coming` (`- CS-14 Invite a member — docs/tasks/CS-14-invite-member.md`), drop `## Coming`
@@ -78,12 +78,15 @@ no sketch file under `docs/sketches/` is not ready — say so instead of writing
 ## 5. Commit, check the numbers, open the PR
 
 `git add` the task files and `docs/todo.md` by name; commit "Tasks: <feature> (CS-14–CS-16)".
-`git fetch origin` and rebase onto `origin/main` again.
+`git fetch origin` and rebase onto `origin/<base>` again.
 
 If the rebase conflicts on the `Next:` line, someone else took those IDs. Keep their line, then
 renumber the new tasks from their `Next:` value: rename the files, fix the IDs inside them, every
 `Blocked by`, the `## Coming` lines and the brief's links; set `Next:` past the last new ID;
 continue the rebase.
+
+PR already open (you came from /anu:resume)? `git push --force-with-lease`, skip
+`gh pr create`, and correct the task IDs in the PR body with `gh pr edit --body-file`.
 
 `git push -u origin design/<feature>`. Write the PR body to a temp file — the brief, the
 sketches, the task list with IDs, the decisions taken — and run

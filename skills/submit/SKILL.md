@@ -1,6 +1,6 @@
 ---
 name: submit
-description: Finish a made task — run the checks, have the read-only QA and security agents check it independently, commit, rebase onto origin/main, push and open the PR (one per repo, linked to each other), then ask one question about friction with anu and put the answer in the PR. Never merges. Use for /anu:submit CS-14, or as the last step of /anu:build.
+description: Finish a made task — run the checks, have the read-only QA and security agents check it independently, commit, rebase onto the base branch, push and open the PR (one per repo, linked to each other), then ask one question about friction with anu and put the answer in the PR. Never merges. Use for /anu:submit CS-14, or as the last step of /anu:build.
 argument-hint: "<task ID>"
 ---
 
@@ -10,7 +10,7 @@ Task: $ARGUMENTS
 
 ## Before you start
 
-Read `## anu` in the repo's CLAUDE.md; missing → stop: "Run /anu:setup first." Find the task's
+Read `## anu` in the repo's CLAUDE.md; missing → stop: "Run /anu:setup first." `<base>` below is its `Base branch` (`main` if the key is absent). Find the task's
 worktree and state.json by exact ID and work there.
 
 The normal start is `stage: "made"`. Stage `planned` → run /anu:make first, then carry on. Stage
@@ -53,7 +53,7 @@ co-author trailer, no "generated with" line.
 
 ## 4. Rebase and push
 
-`git fetch origin` and `git rebase origin/main`. Resolve conflicts keeping both sides' intent;
+`git fetch origin` and `git rebase origin/<base>`. Resolve conflicts keeping both sides' intent;
 ask the user when the intent is unclear. If the rebase brought new commits, run the checks again.
 Then `git push -u origin <branch>`.
 
@@ -92,8 +92,9 @@ docs/tasks/<ID>-<slug>.md
 <filled in at step 6>
 ```
 
-If the task changed more than one repo (`Other repos` in `## anu`), do steps 1–5 in each, then
-update every body's `Related PRs` so each links the others (`gh pr edit <n> --body-file <file>`).
+If the task changed more than one repo (`Other repos` in `## anu`), do steps 1–5 in each — in
+that repo's `task/<ID>-<slug>` worktree, with its own checks and base branch — then update
+every body's `Related PRs` so each links the others (`gh pr edit <n> --body-file <file>`).
 
 Never merge, and never turn on auto-merge.
 
@@ -102,6 +103,10 @@ Never merge, and never turn on auto-merge.
 Ask one question: "Was anything about anu in this task friction, confusing, or worth changing?"
 Put the answer, close to the user's words (or "none"), under `## anu feedback` in each PR body
 with `gh pr edit --body-file`. Never write into the plugin's own folder.
+
+If the answer asks for a change to anu, say where to send it: an issue on anu's repository
+(`repository` in `${CLAUDE_SKILL_DIR}/../../.claude-plugin/plugin.json`). Never file it
+yourself: the words may carry details of this app.
 
 ## 7. Finish
 

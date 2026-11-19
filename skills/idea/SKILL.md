@@ -11,22 +11,22 @@ The idea: $ARGUMENTS
 ## Before you start
 
 Read the `## anu` section of the repo's CLAUDE.md. If it is missing, stop and say: "This repo has
-no `## anu` section. Run /anu:setup first."
+no `## anu` section. Run /anu:setup first." `<base>` below is its `Base branch` (`main` if the key is absent).
 
-No idea given? Show the `## Coming` list from `docs/todo.md` on `origin/main` and ask what to design.
+No idea given? Show the `## Coming` list from `docs/todo.md` on `origin/<base>` and ask what to design.
 
 ## 1. One branch for the whole feature
 
 Pick a short kebab-case feature name (e.g. `member-invites`). `git fetch origin`, then look for
 work already started: a worktree or branch `design/<feature>`, or a brief
-`docs/briefs/*-<feature>.md` on `origin/main`. If found, say what exists and carry on from the
+`docs/briefs/*-<feature>.md` on `origin/<base>`. If found, say what exists and carry on from the
 first missing step.
 
 Otherwise, reuse this session's worktree only if it is a linked worktree — `.git` at its root is a file, not a
 folder (`test -f "$(git rev-parse --show-toplevel)/.git"`) — with no commits
-beyond `origin/main` and nothing uncommitted; then rename its branch: `git branch -m design/<feature>`. If it does
-not pass, make one: `git worktree add -b design/<feature> .claude/worktrees/design-<feature> origin/main`.
-Never rename or switch the main checkout's branch; never commit to main.
+beyond `origin/<base>` and nothing uncommitted; then rename its branch: `git branch -m design/<feature>`. If it does
+not pass, make one: `git worktree add -b design/<feature> .claude/worktrees/design-<feature> origin/<base>`.
+Never rename or switch the main checkout's branch; never commit to `<base>`.
 
 Everything this command writes is committed on `design/<feature>` and goes up as one PR.
 

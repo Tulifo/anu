@@ -4,7 +4,8 @@ anu has 13 commands. Two cover most days: `/anu:idea` designs a feature, `/anu:b
 task. The rest are the steps those two run, and you can run any of them on its own.
 
 Every command first reads the `## anu` section of the repo's CLAUDE.md and stops with "Run
-/anu:setup first." if it is missing.
+/anu:setup first." if it is missing. `origin/<base>` below is the app's base branch on the
+remote: `Base branch` in `## anu`, or `main` when the key is absent.
 
 | Command | Use it to | Stops for you |
 |---|---|---|
@@ -14,12 +15,12 @@ Every command first reads the `## anu` section of the repo's CLAUDE.md and stops
 | [`/anu:sketch`](#anusketch) | draw the screens as HTML | each sketch |
 | [`/anu:screen-check`](#anuscreen-check) | check a screen is easy and safe to use | no |
 | [`/anu:tasks`](#anutasks) | split a feature into numbered tasks | task list |
-| [`/anu:build <ID>`](#anubuild) | one task → PR, with the agent team | no |
+| [`/anu:build <ID>`](#anubuild) | one task → PR, with the agent team | at the start, if QA cannot work |
 | [`/anu:study <ID>`](#anustudy) | read the task and the code first | unmerged blocker or design PR |
 | [`/anu:plan <ID>`](#anuplan) | list the changes and the slices | no |
-| [`/anu:make <ID>`](#anumake) | write the code alone | no |
+| [`/anu:make <ID>`](#anumake) | write the code alone | at the start, if the app cannot be checked |
 | [`/anu:submit <ID>`](#anusubmit) | independent check, push, open the PR | no |
-| [`/anu:resume <ID>`](#anuresume) | continue where a session stopped | only if the place is wrong |
+| [`/anu:resume <ID or feature>`](#anuresume) | continue a task or a design where a session stopped | only if the place is wrong |
 | [`/anu:lessons`](#anulessons) | record what broke before | the file list and each lesson |
 
 ---
@@ -30,11 +31,12 @@ Prepare an app repo to use anu. Run once per app, inside the app repo.
 
 **Steps**
 
-1. Make a worktree on `anu/setup` off `origin/main`. If CLAUDE.md on `origin/main` already has
-   `## anu`, show it and ask what to change instead of starting over.
+1. Find the repo's default branch and make a worktree on `anu/setup` off it. If CLAUDE.md
+   there already has `## anu`, show it, ask what to change, and add any key it lacks.
 2. Find each fact in the repo: stack, checks, local stack and ports, dev sign-in route, screen
    sizes, themes, styles, other repos. Ask in one message only what is missing — usually the
-   task prefix and the design references.
+   task prefix and the design references. No dev sign-in route? It asks whether to build one
+   now, on this branch, with a test that production refuses it.
 3. Write the `## anu` section (see [Configuration](configuration.md)).
 4. Create `docs/briefs/`, `docs/sketches/`, `docs/tasks/`, `docs/work-notes/` (each with a
    `.gitkeep`), `docs/todo.md` with `Next: <PREFIX>-1`, and `LESSONS.md`. Add
@@ -63,7 +65,7 @@ With no idea given, it shows `## Coming` from `docs/todo.md` and asks what to de
 **Steps**
 
 1. Pick a kebab-case feature name. Look for work already started (a `design/<feature>` branch or
-   worktree, or a brief on `origin/main`) and carry on from the first missing step. Otherwise make
+   worktree, or a brief on `origin/<base>`) and carry on from the first missing step. Otherwise make
    or reuse a worktree on `design/<feature>`.
 2. Run `/anu:brief`.
 3. Run `/anu:sketch` for every screen the brief lists (skipped if the feature has no screen).
@@ -173,13 +175,14 @@ Split a feature into numbered tasks and open the design PR.
 1. Draft vertical slices: data, server and screen for one behaviour a user can test, 1–3 days
    each. A screen that sets something up comes before the screens that use it.
 2. **Stop:** show the numbered list — title, size, blocked by, acceptance lines.
-3. Reserve the IDs: rebase onto `origin/main`, read `Next:` in `docs/todo.md`, move it on, add
+3. Reserve the IDs: rebase onto `origin/<base>`, read `Next:` in `docs/todo.md`, move it on, add
    the tasks to `## Coming`, and commit that alone ("Reserve CS-14–CS-16").
 4. Write one file per task, `docs/tasks/<ID>-<slug>.md`: what and why, acceptance lines, the
    slice (data, server, screen), files likely touched, the pattern to follow, lessons that apply.
 5. Rebase again. On a conflict on the `Next:` line, renumber (see
    [How it works → Task IDs](how-it-works.md#task-ids)). Push and open the PR "<Feature>: brief,
-   sketches, tasks".
+   sketches, tasks". If the PR is already open (you came from `/anu:resume`), it pushes with
+   `--force-with-lease` and corrects the IDs in the PR body.
 
 A task with a screen names its exact sketch file. A screen with no sketch file is not ready, and
 anu says so instead of writing the task.
@@ -195,18 +198,23 @@ One task to a PR with the agent team. Run in a session started with
 /anu:build CS-14
 ```
 
+**Before it starts** it checks the session is the tech lead, agent teams are on, a browser tool
+is available, and `Dev sign-in` in `## anu` is not `none yet`. Any one missing stops it with
+the fix; the last two it will go on without if you say so.
+
 **Steps**
 
 1. Study and plan, carrying on from the task's stage. No wait for an OK on the plan.
 2. Start the local stack from `## anu` (reuse a running one; never start a second copy).
 3. Spawn the team as an agent team, with shared tasks and dependencies:
-   `stack` → `slice-a` and `slice-b` (`dev-a`, `dev-b`) → `qa` and `security` → `land`.
+   `stack` → `slice-a` and `slice-b` (`dev-a`, `dev-b`) → `qa` and `security` → `land`. A
+   one-slice plan gets `slice-a` and `dev-a` only.
 4. Run it: a slice is done when its dev reports green checks, QA has verified it in the running
    app, and security has cleared its diff. Defects go back to the owning dev by name.
 5. Land it with `/anu:submit`, adding `## Slices` (who built what) to the PR.
 6. Shut the team down, stop the local stack if it started it, and report.
 
-**Stops** none until the PR. See [The build team](team.md) for how the team works.
+**Stops** none between the start and the PR. See [The build team](team.md) for how the team works.
 
 ---
 
@@ -216,12 +224,13 @@ Read a task and the code it touches before changing anything.
 
 **Steps**
 
-1. Find the task file by exact ID on `origin/main`. Not there but on an open `design/*` branch →
+1. Find the task file by exact ID on `origin/<base>`. Not there but on an open `design/*` branch →
    say its design PR is not merged, and go on only if you say so.
 2. Already started (a `task/<ID>-` branch with a stage set)? Hand over to `/anu:resume`.
 3. Check every blocker's PR is `MERGED`, in this repo and in each of `Other repos`. If not, stop
    and name it.
-4. Make or reuse a worktree on `task/<ID>-<slug>` and write `state.json`.
+4. Make or reuse a worktree on `task/<ID>-<slug>` and write `state.json` (no path in it: the
+   worktree is found by its branch).
 5. Read CLAUDE.md, the `LESSONS.md` entries for the files it may touch, the task, its brief and
    sketches (screenshotting each sketch at every screen size into `shots/`), every file it will
    touch, and one example of each pattern it needs.
@@ -234,7 +243,7 @@ Read a task and the code it touches before changing anything.
 
 ## /anu:plan
 
-List the changes file by file and split them into two slices.
+List the changes file by file and split them into slices.
 
 **Steps**
 
@@ -244,7 +253,11 @@ List the changes file by file and split them into two slices.
    components; tests; how each acceptance line is checked; what is out; decisions taken.
 2. Show the plan in a few lines and carry on.
 
-A small task may have one slice, with a reason. A screen with no sketch file stops the plan.
+A task too small to split has one slice, built by one dev, with the reason in one line. A screen
+with no sketch file stops the plan.
+
+A change in one of `Other repos` is written as `<repo>:<path>`, and the plan makes a worktree in
+that repo on the same branch name, off that repo's own base branch.
 
 **Writes** `docs/work-notes/<ID>/plan.md`. Stage `planned`. Run it again by hand to redo a plan.
 
@@ -253,6 +266,9 @@ A small task may have one slice, with a reason. A screen with no sketch file sto
 ## /anu:make
 
 Write the code alone, in plan order, without pausing between parts.
+
+**Before it starts** it checks a browser tool is there and, for a screen behind sign-in, a dev
+sign-in URL. If one is missing it stops, says how to get it, and goes on only if you say so.
 
 **Steps**
 
@@ -284,11 +300,12 @@ Check, push and open the PR. The last step of both the team and the solo path.
    running app, and `anu:security-engineer` reviews the diff. Every QA fail and security blocker
    is fixed and re-checked. A "should fix" finding may land, listed under `## Follow-ups`.
 3. Commit the task's files by name, under your git identity.
-4. `git fetch origin`, `git rebase origin/main`, checks again if new commits came in, push.
+4. `git fetch origin`, `git rebase origin/<base>`, checks again if new commits came in, push.
 5. Open the PR with `--body-file`: What, Task, Acceptance (checked by QA), Security, Checks,
-   Decisions taken, Follow-ups, Related PRs, anu feedback. One PR per repo, linked to each other.
+   Decisions taken, Follow-ups, Related PRs, anu feedback. One PR per repo, linked to each
+   other; each repo's steps run in its own worktree with its own checks.
 6. Ask one question — was anything about anu friction, confusing, or worth changing — and put the
-   answer in each PR.
+   answer in each PR. If it asks for a change to anu, say where to open an issue.
 
 A line that cannot be checked locally (a real mail provider, real payments) is written as "not
 checked locally — <why>", never as a pass.
@@ -299,14 +316,20 @@ checked locally — <why>", never as a pass.
 
 ## /anu:resume
 
-Continue a task where the last session stopped.
+Continue a task, or a feature's design, where the last session stopped.
 
-**Steps**
+```
+/anu:resume CS-14
+/anu:resume member-invites
+```
+
+**Steps for a task**
 
 1. Find the worktree whose branch starts with `task/<ID>-` (or re-create it from
-   `origin/task/<ID>-*`). With no ID, list every task worktree with its stage and ask which.
-2. Check the branch and worktree path match `state.json`; stop and say what differs if not.
-3. Show uncommitted files and commits not yet on main. If every PR is merged, set `merged`.
+   `origin/task/<ID>-*`). With nothing given, list every task and design worktree and ask which.
+2. Check the branch matches `state.json`; stop and say what differs if not.
+3. Show uncommitted files and commits not yet on the base branch, here and in any other repo
+   the plan changes. If every PR is merged, set `merged`.
 4. Report, then run the next stage.
 
 | Last finished | Runs next |
@@ -320,6 +343,15 @@ Continue a task where the last session stopped.
 
 Uncommitted files are the last session's work in progress: kept and carried on from, never
 stashed, reset or discarded.
+
+**For a design** (`design/<feature>`) it finds or re-creates the worktree, shows the PR, then:
+
+| The design PR | Does |
+|---|---|
+| not opened yet | runs `/anu:idea`, which carries on from the first missing step |
+| open, in conflict | rebases and renumbers the tasks, as `/anu:tasks` step 5 |
+| open, with review comments | changes what they name, commits, pushes, replies |
+| merged | done; offers to remove the worktree, only on your yes |
 
 ---
 

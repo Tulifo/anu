@@ -8,10 +8,16 @@
   marketplace.json     lets `claude plugin marketplace add Tulifo/anu` find the plugin
   icon.png             1024×1024 icon, rendered from assets/logo.svg
 agents/                tech-lead, senior-dev, qa-engineer, security-engineer
+hooks/                 hooks.json and read_only.py: the shell is read-only for QA and security
 skills/<name>/SKILL.md one folder per command; /anu:<name> runs it
 skills/sketch/serve.py the sketch preview server (standard library only)
 assets/logo.svg        the logo, source of the icon
 docs/                  this documentation
+scripts/check.py       the checks every pull request must pass
+tests/                 tests for the hook and the preview server
+.github/               the check workflow and the feedback issue template
+CHANGELOG.md           one entry per version
+LICENSE                MIT
 README.md
 ```
 
@@ -30,7 +36,12 @@ README.md
   or cut it.
 - **Stops** are only the design stops in `/anu:idea` and the PR merge. A new stop needs a reason
   that is a problem, not a decision (see [How it works → Where it stops](how-it-works.md#where-it-stops)).
-- **Git:** work in a worktree off `origin/main`, never on main; add files by name; `--body-file`
+- **Base branch:** never write `main`. Write `origin/<base>` and define `<base>` in "Before you
+  start" as `Base branch` in `## anu`, `main` if the key is absent.
+- **No machine paths in committed files.** Find a worktree by its branch.
+- **Docs in the same PR:** a change to a skill changes its section in
+  [Commands](commands.md) too.
+- **Git:** work in a worktree off `origin/<base>`, never on the base branch; add files by name; `--body-file`
   for PR bodies; never merge; no AI trailer in commits or PRs.
 
 ## Rules for agents
@@ -38,9 +49,11 @@ README.md
 - **Frontmatter:** `name`, `description`, `model`, and `disallowedTools` for read-only agents.
 - **Models are pinned in the agent file:** tech-lead `fable`, senior-dev `opus`, security-engineer
   `opus`, qa-engineer `sonnet`. Skills spawn by agent type and never name a model.
-- **Read-only agents** (QA, security) list `Edit, Write, NotebookEdit` in `disallowedTools` and
-  say in their instructions that the shell is read-only too.
-- **No** `hooks`, `mcpServers` or `permissionMode` in agent files.
+- **Read-only agents** (QA, security) list `Edit, Write, NotebookEdit` in `disallowedTools`, say
+  in their instructions that the shell is read-only too, and are named in `READ_ONLY` in
+  `hooks/read_only.py`, which refuses their shell commands that write.
+- **No** `hooks`, `mcpServers` or `permissionMode` in agent files: Claude Code ignores them in a
+  plugin's agents. That is why the read-only rule is a plugin hook.
 
 ## Try a change locally
 
@@ -63,22 +76,35 @@ Code there with `--plugin-dir <path to your anu checkout>`.
 claude plugin validate .
 ```
 
-It must pass. Then:
+It must pass. Then the checks the pull request runs (`.github/workflows/check.yml`):
 
-- every `skills/<name>/SKILL.md` has `name: <name>`;
-- `wc -l skills/*/SKILL.md` shows none far over 150 lines;
-- both JSON files parse: `python3 -m json.tool .claude-plugin/plugin.json`;
-- no app or product facts crept in: grep the diff for ports, product names and stack names.
+```bash
+python3 scripts/check.py
+```
+
+```bash
+python3 -m unittest discover -s tests
+```
+
+`check.py` checks the manifests agree and the version has a changelog entry, every skill and
+agent is named after its file, is short and has a section in the docs, and every relative link
+and anchor resolves. The tests cover the read-only hook and the preview server.
+
+One check stays by hand: no app or product facts crept in. Grep the diff for ports, product
+names and stack names.
 
 ## Release
 
 1. Branch off `main` (better, a worktree), make the change, run the checks.
 2. Bump `version` in `.claude-plugin/plugin.json` — patch for wording and fixes, minor for a
-   behaviour change. Installs do not move without a bump.
+   behaviour change — and add its entry at the top of `CHANGELOG.md`. Installs do not move
+   without a bump.
 3. Commit under your own name, push, open a PR. `main` is protected: every change goes through a
-   PR, history stays linear (rebase or squash merge, no merge commits), and force pushes are
-   blocked.
-4. After the merge, everyone updates with:
+   PR whose `check` run passes, history stays linear (rebase or squash merge, no merge
+   commits), and force pushes are blocked.
+4. After the merge, tag the release on `main`: `git tag v<version> origin/main` and
+   `git push origin v<version>`.
+5. Everyone updates with:
 
 ```bash
 claude plugin update anu@anu

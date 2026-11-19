@@ -1,0 +1,19 @@
+name: check
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Manifests, skills, agents, links
+        run: python3 scripts/check.py
+      - name: Hook and preview server tests
+        run: python3 -m unittest discover -s tests -v

@@ -27,7 +27,7 @@ flowchart TD
     end
     subgraph Build
         direction LR
-        BU["/anu:build CS-14"] --> ST["study"] --> PL["plan"] --> MK["two devs build"]
+        BU["/anu:build CS-14"] --> ST["study"] --> PL["plan"] --> MK["devs build"]
         MK --> QA["QA in the running app"]
         MK --> SEC["security review"]
         QA --> PR(["task PR: you merge"])

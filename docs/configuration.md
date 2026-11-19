@@ -25,22 +25,26 @@ hand whenever they change; run `/anu:setup` again to have it re-read the repo.
 - Themes: light, dark (switch: class `dark` on html)
 - Styles: `src/styles/tokens.css`; components: `src/components/ui`; icons: lucide (`node_modules/lucide-static/icons`)
 - Task prefix: CS
+- Base branch: main
 - Design references: Linear settings pages, Stripe dashboard tables
 - Other repos: none
 ```
+
+An `## anu` section written before 0.3.0 has no `Base branch` line; anu then uses `main`.
 
 | Key | What it holds | Who uses it |
 |---|---|---|
 | `Stack` | languages, frameworks, database, hosting | everyone, to read the code the right way |
 | `Checks` | every command that must pass before a PR: type check, lint, tests | make, submit, the devs, QA |
 | `Local stack` | the start command, the app URL, every port | make, submit, the lead, QA |
-| `Dev sign-in` | the URL that opens a session without a password, and the seeded users | sketch checks, make, QA, screen-check |
+| `Dev sign-in` | the URL that opens a session without a password, and the seeded users; `none yet`, or `none (no sign-in)` | sketch checks, make, build, QA, screen-check |
 | `Screen sizes` | every size screens are drawn and checked at (default `390x844, 1280x800`) | sketch, study, make, QA |
 | `Themes` | the themes and the class or attribute that switches them | sketch, make, QA |
 | `Styles` | the tokens file, the component folder, the icon package and where its SVG data lives | sketch, make, the devs |
 | `Task prefix` | the letters in front of every task ID (`CS` → `CS-14`) | tasks, study, resume |
+| `Base branch` | the branch worktrees start from and PRs go to: the repo's default branch | every command that branches, rebases or compares |
 | `Design references` | apps, screens or files sketches should match | brief, sketch |
-| `Other repos` | other repos a task here may also change, with their local paths | study (blockers), submit (one PR per repo) |
+| `Other repos` | other repos a task here may also change, each with its path from this repo's main checkout (`api (../api)`) | study (blockers), plan (a worktree there), submit (one PR per repo) |
 
 ## Dev sign-in
 
@@ -64,8 +68,10 @@ The route must be safe to ship in the codebase:
 - It has tests: it works locally, it returns 404 in production mode, and it rejects an outside
   `next`.
 
-If the app has no such route, setup writes `Dev sign-in: none yet`. Add one before the first
-`/anu:build` that touches a screen behind a login; until then QA cannot reach those screens.
+If the app has no such route, `/anu:setup` asks whether to build one now, on the setup branch,
+following the rules above. If you say no it writes `Dev sign-in: none yet`, and `/anu:build` and
+`/anu:make` then stop at the start: QA cannot reach a screen behind a login. An app with no
+sign-in at all gets `none (no sign-in)`, which stops nothing.
 
 ## `.claude/settings.json` in the app repo
 

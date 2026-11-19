@@ -10,14 +10,16 @@ This writes that section and the files the other commands use.
 
 ## 1. Work in a worktree
 
-Run inside the app repo. `git fetch origin`. Reuse this session's worktree only if it is a linked worktree — `.git` at its root is a file, not a
+Run inside the app repo. `git fetch origin`. `<base>` is the repo's default branch:
+`git symbolic-ref --short refs/remotes/origin/HEAD` without the `origin/` (if that fails, run
+`git remote set-head origin --auto` and try again). Reuse this session's worktree only if it is a linked worktree — `.git` at its root is a file, not a
 folder (`test -f "$(git rev-parse --show-toplevel)/.git"`) — with no commits
-beyond `origin/main` and nothing uncommitted; then rename its branch: `git branch -m anu/setup`.
-Otherwise `git worktree add -b anu/setup .claude/worktrees/anu-setup origin/main` and work there.
-Never rename or switch the main checkout's branch; never commit to main.
+beyond `origin/<base>` and nothing uncommitted; then rename its branch: `git branch -m anu/setup`.
+Otherwise `git worktree add -b anu/setup .claude/worktrees/anu-setup origin/<base>` and work there.
+Never rename or switch the main checkout's branch; never commit to `<base>`.
 
-If CLAUDE.md on `origin/main` already has `## anu`, show it and ask what to change instead of
-starting over.
+If CLAUDE.md on `origin/<base>` already has `## anu`, show it and ask what to change instead of
+starting over; add any key below that it lacks.
 
 ## 2. Read the repo, then ask only what is missing
 
@@ -38,9 +40,12 @@ Then ask, in one message, only what you could not find. The task prefix (suggest
 repo name, e.g. `CS` for a repo named `customer-site`) and the design references (apps, screens or files sketches
 should match) usually need asking.
 
-No dev sign-in route? Write `none yet` and tell the user QA needs one: a route the server opens
-only outside production, checked in the handler itself, with no env flag or setting that can
-open it on a deployed host.
+No dev sign-in route? An app with no sign-in at all gets `none (no sign-in)`. Otherwise QA
+cannot reach the screens, so ask: build the route now (recommended), or leave it. On yes, write
+it on this branch in the app's own style: a GET route that signs in a seeded test user and
+redirects to `next`. The handler itself refuses in production, no env flag or setting can open
+it on a deployed host, and `next` accepts a local path only. Add a test that production
+refuses it. On no, write `none yet`: /anu:build and /anu:make stop on it.
 
 ## 3. Write the `## anu` section
 
@@ -58,8 +63,9 @@ and their order — every anu skill reads them by name:
 - Themes: light, dark (switch: <class or attribute on html>)
 - Styles: `<tokens file>`; components: `<folder>`; icons: <package> (`<path to its SVG data>`)
 - Task prefix: CS
+- Base branch: <base>
 - Design references: <apps, screens or files>
-- Other repos: <name and local path> | none
+- Other repos: <name (path from this repo's main checkout, e.g. `../api`)> | none
 ```
 
 ## 4. Folders and files

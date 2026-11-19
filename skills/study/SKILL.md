@@ -1,6 +1,6 @@
 ---
 name: study
-description: Read a task and the code it touches before changing anything — find the task by exact ID, check its blockers are merged, make its worktree and branch off origin/main, and write docs/work-notes/<ID>/study.md and state.json. Use for /anu:study CS-14, or as the first step of /anu:build.
+description: Read a task and the code it touches before changing anything — find the task by exact ID, check its blockers are merged, make its worktree and branch off the base branch, and write docs/work-notes/<ID>/study.md and state.json. Use for /anu:study CS-14, or as the first step of /anu:build.
 argument-hint: "<task ID, e.g. CS-14>"
 ---
 
@@ -10,14 +10,14 @@ Task: $ARGUMENTS
 
 ## Before you start
 
-Read `## anu` in the repo's CLAUDE.md; missing → stop: "Run /anu:setup first."
+Read `## anu` in the repo's CLAUDE.md; missing → stop: "Run /anu:setup first." `<base>` below is its `Base branch` (`main` if the key is absent).
 
 ## 1. Find the task — by exact ID
 
-`git fetch origin`. The task file is `docs/tasks/<ID>-*.md` on `origin/main`
-(`git ls-tree --name-only origin/main docs/tasks/`). Match the ID exactly: `CS-4` matches
+`git fetch origin`. The task file is `docs/tasks/<ID>-*.md` on `origin/<base>`
+(`git ls-tree --name-only origin/<base> docs/tasks/`). Match the ID exactly: `CS-4` matches
 `CS-4-…`, never `CS-41-…`. No ID given → list `## Coming` from `docs/todo.md` and ask which.
-Not on `origin/main` → look on open `origin/design/*` branches; if it is there, say its design PR
+Not on `origin/<base>` → look on open `origin/design/*` branches; if it is there, say its design PR
 is not merged yet and go on only if the user says so.
 
 ## 2. Already started?
@@ -37,9 +37,9 @@ stop, name the blocker and its PR state, and go on only if the user says so.
 ## 4. Make the worktree
 
 Branch `task/<ID>-<slug>` (the slug from the task file name). Reuse this session's worktree only if it is a linked worktree — `.git` at its root is a file, not a
-folder (`test -f "$(git rev-parse --show-toplevel)/.git"`) — with no commits beyond `origin/main` and nothing uncommitted; then rename its branch: `git branch -m task/<ID>-<slug>`.
-Otherwise `git worktree add -b task/<ID>-<slug> .claude/worktrees/<ID> origin/main` and work
-there. Never rename or switch the main checkout's branch; never commit to main.
+folder (`test -f "$(git rev-parse --show-toplevel)/.git"`) — with no commits beyond `origin/<base>` and nothing uncommitted; then rename its branch: `git branch -m task/<ID>-<slug>`.
+Otherwise `git worktree add -b task/<ID>-<slug> .claude/worktrees/<ID> origin/<base>` and work
+there. Never rename or switch the main checkout's branch; never commit to `<base>`.
 
 Write `docs/work-notes/<ID>/state.json`:
 
@@ -49,13 +49,13 @@ Write `docs/work-notes/<ID>/state.json`:
   "file": "docs/tasks/CS-14-invite-member.md",
   "stage": null,
   "branch": "task/CS-14-invite-member",
-  "worktree": "<absolute path>",
   "pr": [],
   "updated": "YYYY-MM-DD"
 }
 ```
 
-`stage` is the last finished stage: `null` → `studied` → `planned` → `made` → `submitted` →
+No path is stored: the worktree is found by its branch (`git worktree list`), so the notes
+work on any machine. `stage` is the last finished stage: `null` → `studied` → `planned` → `made` → `submitted` →
 `merged`. Each step starts normally from the one before it.
 
 ## 5. Read

@@ -59,7 +59,7 @@ brief, each sketch and the task list, then one PR:
 /anu:idea "members can invite others by email"
 ```
 
-**Build a task** — no stop until the PR. The tech lead plans it, two senior devs build it, QA
+**Build a task** — no stop until the PR. The tech lead plans it, senior devs build it (two, or one for a small task), QA
 checks it in the running app, security reviews the diff, and the lead opens the PR. You merge.
 
 ```bash
@@ -89,7 +89,7 @@ The full walk-through is in [Getting started](docs/getting-started.md).
 | `/anu:plan CS-14` | list the changes and who builds which part |
 | `/anu:make CS-14` | write the code |
 | `/anu:submit CS-14` | independent QA and security check, push, open the PR |
-| `/anu:resume CS-14` | continue a task where the last session stopped |
+| `/anu:resume CS-14` | continue a task, or a feature's design, where the last session stopped |
 | `/anu:lessons` | record "this broke before, don't repeat it" with file:line |
 | `/anu:setup` | prepare an app repo to use anu (once per app) |
 
@@ -100,7 +100,7 @@ Each one in detail: [Commands](docs/commands.md).
 | Agent | Model | Does |
 |---|---|---|
 | `anu:tech-lead` | fable | studies, plans, splits the work, gates it, opens the PR |
-| `anu:senior-dev` | opus | builds one slice (two per task) |
+| `anu:senior-dev` | opus | builds one slice (one dev per slice) |
 | `anu:qa-engineer` | sonnet | checks it in the running app; read-only |
 | `anu:security-engineer` | opus | reviews the diff; read-only |
 
@@ -108,7 +108,8 @@ How they work together: [The build team](docs/team.md).
 
 ## Ground rules
 
-- All work happens in a git worktree on a branch off `origin/main`. anu never commits to `main`.
+- All work happens in a git worktree on a branch off the app's base branch (`main` unless
+  `## anu` says otherwise). anu never commits to the base branch.
 - anu never merges and never turns on auto-merge.
 - Commits and PRs carry your git identity only.
 - A task is not built until every task it is blocked by has a merged PR, unless you say so.
@@ -124,3 +125,9 @@ How they work together: [The build team](docs/team.md).
 | [Configuration](docs/configuration.md) | the `## anu` section, settings, dev sign-in |
 | [Troubleshooting](docs/troubleshooting.md) | every stop message and what to do |
 | [Changing anu](docs/contributing.md) | layout, rules, testing, releasing, the logo |
+
+What changed in each version: [Changelog](CHANGELOG.md).
+
+## Licence
+
+[MIT](LICENSE).
