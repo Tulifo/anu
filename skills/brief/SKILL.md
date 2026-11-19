@@ -10,12 +10,12 @@ Input: $ARGUMENTS (an idea, a feature name, or nothing to continue the current d
 
 ## Before you start
 
-Read `## anu` in the repo's CLAUDE.md; missing → stop: "Run /anu:setup first." Work in the
-feature's `design/<feature>` worktree (see /anu:idea step 1), never on main.
+Read `## anu` in the repo's CLAUDE.md; missing → stop: "Run /anu:setup first." `<base>` below is its `Base branch` (`main` if the key is absent).
+Work in the feature's `design/<feature>` worktree (see /anu:idea step 1), never on `<base>`.
 
 ## 1. Read before asking
 
-- Briefs in `docs/briefs/` and tasks in `docs/tasks/` on `origin/main`: was part of this
+- Briefs in `docs/briefs/` and tasks in `docs/tasks/` on `origin/<base>`: was part of this
   designed already?
 - The code: search for anything close to the idea (a field, a flag, an endpoint, a screen). Tell
   the user what you found before proposing anything; extending what exists usually beats a second

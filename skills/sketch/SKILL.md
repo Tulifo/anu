@@ -11,7 +11,7 @@ Input: $ARGUMENTS (a feature name or brief path; default: the brief on the curre
 ## Before you start
 
 Read `## anu` in the repo's CLAUDE.md; missing → stop: "Run /anu:setup first." Work in the
-feature's `design/<feature>` worktree, never on main. Read the brief.
+feature's `design/<feature>` worktree, never on the base branch. Read the brief.
 
 From `## anu` take the styles file, the component folder, the icon package, the themes, every
 screen size and the design references. Read the styles file and two or three real screens of the

@@ -10,14 +10,14 @@ Start from: $ARGUMENTS (a bug just fixed, a file, an area — or nothing, to fin
 
 ## Before you start
 
-Read `## anu` in the repo's CLAUDE.md; missing → stop: "Run /anu:setup first." Read `LESSONS.md`
+Read `## anu` in the repo's CLAUDE.md; missing → stop: "Run /anu:setup first." `<base>` below is its `Base branch` (`main` if the key is absent). Read `LESSONS.md`
 so no lesson is recorded twice. `git fetch origin`, and pick a short kebab-case topic (the bug,
 file or area). Reuse this session's worktree only if it is a linked worktree — `.git` at its root is a file, not a
 folder (`test -f "$(git rev-parse --show-toplevel)/.git"`) — with no commits
-beyond `origin/main` and nothing uncommitted; then rename
+beyond `origin/<base>` and nothing uncommitted; then rename
 its branch: `git branch -m lessons/<topic>`. Otherwise
-`git worktree add -b lessons/<topic> .claude/worktrees/lessons-<topic> origin/main`; if that
-branch exists, add `-2`. Never rename or switch the main checkout's branch; never commit to main.
+`git worktree add -b lessons/<topic> .claude/worktrees/lessons-<topic> origin/<base>`; if that
+branch exists, add `-2`. Never rename or switch the main checkout's branch; never commit to `<base>`.
 
 ## 1. Find where the lessons are
 

@@ -13,6 +13,10 @@ Task: $ARGUMENTS
 Read `## anu` in the repo's CLAUDE.md; missing → stop: "Run /anu:setup first." Find the task's
 worktree and state.json by exact ID and work there.
 
+Step 3 needs a browser tool and, for a screen behind sign-in, a dev sign-in URL in `## anu`. If
+one is missing, stop now and say which and how to get it (the Playwright MCP; /anu:setup for the
+route). Go on only if the user says so, and report those screens as not checked.
+
 The normal start is `stage: "planned"`. Stage `studied` → run /anu:plan first, then carry on.
 Stage `made` or later → say so and ask: rework, or go on to /anu:submit.
 
@@ -31,6 +35,8 @@ screenshots in `docs/work-notes/<ID>/shots/`.
 - A gap the plan does not cover: decide without stopping — the brief's default, else the smallest
   choice that exposes no more data than the brief allows — and add it to `plan.md` under
   `## Decisions taken`.
+- A path the plan writes as `<repo>:<path>` is changed in that repo's `task/<ID>-<slug>`
+  worktree, never in its main checkout.
 - Do not pause after each part. Do not commit; /anu:submit commits.
 
 ## 2. Check

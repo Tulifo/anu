@@ -48,11 +48,26 @@ to go on.
 A task or plan names a screen with no HTML file under `docs/sketches/`. Run `/anu:sketch` for it
 and merge that, or remove the screen from the task. A link to a design tool does not count.
 
-### The worktree or branch differs from `state.json`
+### The branch differs from `state.json`
 
-`/anu:resume` found the task's worktree on a different branch or path than its notes say —
-usually because a worktree was moved, or a branch was renamed by hand. anu shows both values.
-Say which is right; anu corrects `state.json` only after you agree.
+`/anu:resume` found the task's worktree on a different branch than its notes say — usually
+because a branch was renamed by hand. anu shows both values. Say which is right; anu corrects
+`state.json` only after you agree. Where the worktree sits does not matter: the path is not
+stored, so the same notes work on another machine.
+
+### "QA needs a browser tool."
+
+No browser tool is available to the session, so QA could not see a page. Add one and restart:
+
+```bash
+claude mcp add playwright npx @playwright/mcp@latest
+```
+
+### "QA cannot sign in."
+
+`Dev sign-in` in `## anu` says `none yet`. Run `/anu:setup` and let it build the route (see
+[Configuration → Dev sign-in](configuration.md#dev-sign-in)), or tell anu to go on: the PR then
+lists the screens that were not checked.
 
 ### A rebase conflict anu cannot settle
 
@@ -118,6 +133,19 @@ The app has no dev sign-in route, or `## anu` has the wrong URL. See
 [Configuration → Dev sign-in](configuration.md#dev-sign-in). Agents never type passwords into a
 sign-in form, so there is no other way in.
 
+### QA or security says a command was refused
+
+The message starts `anu: … is read-only`. anu's hook refused a shell command from a read-only
+agent because it writes a file or changes git state. That is the hook working. If it refused a
+command that only reads, the agent can use another form (the Grep or Read tool); please report
+the command so the pattern can be fixed.
+
+### The base branch is not `main`
+
+anu reads `Base branch` in `## anu`. Setup fills it in from the repo's default branch. In an
+app set up before 0.3.0 the line is missing and anu uses `main`: add `- Base branch: <name>` by
+hand, or run `/anu:setup` again.
+
 ### The local stack is already running
 
 anu reuses a running stack and never starts a second copy. It never stops a stack another session
@@ -126,11 +154,14 @@ started; the session that started it stops it.
 ### A task's notes cannot be found
 
 Notes are found by the exact ID folder on the task's branch: a worktree on `task/<ID>-…` holding
-`docs/work-notes/<ID>/state.json`. Run `/anu:resume` with no ID to list every task worktree. If
+`docs/work-notes/<ID>/state.json`. Run `/anu:resume` with no ID to list every task and design
+worktree. If
 the branch exists only on the remote, `/anu:resume <ID>` re-creates its worktree.
 
 ## Giving feedback on anu
 
 At the end of every `/anu:submit`, anu asks whether anything was friction, confusing, or worth
-changing, and puts your answer in the PR under `## anu feedback`. To change anu itself, see
-[Changing anu](contributing.md).
+changing, and puts your answer in the PR under `## anu feedback`. That keeps it next to the work
+it is about, but it stays in your app's repo. To get a change made, open an issue on anu's
+repository with the "Feedback from a task" template, leaving out anything about your app. To
+change anu yourself, see [Changing anu](contributing.md).

@@ -1,11 +1,14 @@
 {
   "name": "anu",
-  "owner": { "name": "Arun" },
+  "owner": { "name": "Arun Kumar" },
+  "metadata": { "description": "anu: a process plugin that takes an idea to merged code in any app." },
   "plugins": [
     {
       "name": "anu",
       "source": "./",
-      "description": "Idea to merged code for any app: brief, sketches and tasks, then an agent team that builds, checks and submits each task."
+      "description": "Idea to merged code for any app: brief, sketches and tasks, then an agent team that builds, checks and submits each task.",
+      "author": { "name": "Arun Kumar" },
+      "license": "MIT"
     }
   ]
 }

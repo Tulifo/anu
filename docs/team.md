@@ -9,14 +9,18 @@ started it.
 | Agent | Name in the team | Model | Can edit files | Does |
 |---|---|---|---|---|
 | `anu:tech-lead` | (your session) | fable | yes | studies, plans, splits the work, starts the local stack, gates each slice, lands the PR |
-| `anu:senior-dev` | `dev-a`, `dev-b` | opus | only the files it owns | builds one slice, tests it, looks at it running |
+| `anu:senior-dev` | `dev-a`, `dev-b` | opus | only the files it owns | builds one slice, tests it, looks at it running; one dev per slice |
 | `anu:qa-engineer` | `qa` | sonnet | no | checks the task in the running app against its acceptance lines and sketches |
 | `anu:security-engineer` | `security` | opus | no | reviews the diff and the code it calls into |
 
 Each agent definition pins its own model, so the tech lead spawns by agent type and never names
-a model. QA and security have `Edit`, `Write` and `NotebookEdit` turned off, and their
-instructions forbid writing files through the shell too (`>`, `sed -i`, `rm`, `mv`), as well as
-commits, branch changes and `git stash`.
+a model.
+
+QA and security are read-only in two ways. `Edit`, `Write` and `NotebookEdit` are turned off in
+their definitions. And a hook that ships with anu (`hooks/read_only.py`) refuses their shell
+commands that write a file (`>`, `sed -i`, `rm`, `mv`, `cp`) or change git state (`commit`,
+`push`, `checkout`, `stash`). The hook matches patterns; it is not a sandbox, so a write hidden
+inside `python -c` or `bash -c` still passes, and their instructions forbid that too.
 
 ## Turning it on
 
@@ -32,7 +36,8 @@ Restart Claude Code, then start the session as the tech lead:
 claude --agent anu:tech-lead
 ```
 
-`/anu:build` checks both and stops with the fix if either is missing.
+`/anu:build` checks both and stops with the fix if either is missing. It also checks QA can
+work — a browser tool, and a dev sign-in route in `## anu` — before anyone is spawned.
 
 ## How a build runs
 
@@ -52,7 +57,8 @@ flowchart LR
    two slices with no file in common — usually the screen (`dev-a`) and the server and data
    (`dev-b`). A shared file such as a router or `package.json` belongs to one dev; the other asks
    its owner for the change. The shared interfaces (endpoint or function names, inputs, outputs,
-   errors, data fields) are written down first.
+   errors, data fields) are written down first. A task too small to split is one slice: the lead
+   spawns `dev-a` only, and QA and security wait on that one slice.
 2. **Local stack.** The lead starts the one local stack from `## anu` in the task's worktree,
    seeds it if the app has a seed step, and tells the team it is up. It never starts a second
    copy and never stops one another session started (it checks with `lsof -a -p <pid> -d cwd`).
@@ -143,5 +149,5 @@ blockers are fixed and sent back to the same agent for a re-check before the PR 
 - No stop until the PR: decide, and list each call under "Decisions taken".
 - Stop only for something destructive or outside the local stack: a real third-party service, a
   deploy, production data, billing.
-- Never deploy, never commit to `main`, never merge. Commits and PRs carry your identity only.
+- Never deploy, never commit to the base branch, never merge. Commits and PRs carry your identity only.
 - One short status line to you each time a shared task changes state.

@@ -1,5 +1,9 @@
 {
   "name": "anu",
-  "version": "0.2.2",
-  "description": "Idea to merged code for any app: brief, sketches and tasks, then an agent team that builds, checks and submits each task."
+  "version": "0.3.0",
+  "description": "Idea to merged code for any app: brief, sketches and tasks, then an agent team that builds, checks and submits each task.",
+  "author": { "name": "Arun Kumar" },
+  "license": "MIT",
+  "homepage": "https://github.com/Tulifo/anu",
+  "repository": "https://github.com/Tulifo/anu"
 }

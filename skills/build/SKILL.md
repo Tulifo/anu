@@ -1,6 +1,6 @@
 ---
 name: build
-description: Take one task to finished code ready for review with the agent team, without stopping until the PR — the tech lead studies and plans it, two senior devs build two slices, QA checks it in the running app, security reviews the diff, and the lead opens the PR. Use for /anu:build CS-14, in a session started with `claude --agent anu:tech-lead`.
+description: Take one task to finished code ready for review with the agent team, without stopping until the PR — the tech lead studies and plans it, a senior dev builds each slice, QA checks it in the running app, security reviews the diff, and the lead opens the PR. Use for /anu:build CS-14, in a session started with `claude --agent anu:tech-lead`.
 argument-hint: "<task ID>"
 ---
 
@@ -16,13 +16,22 @@ Task: $ARGUMENTS
   and say: "Set `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS` to `1` in the `env` of
   ~/.claude/settings.json, then restart."
 - Read `## anu` in the repo's CLAUDE.md; missing → stop: "Run /anu:setup first."
+- QA must be able to see the app. Check both before any work:
+  - a browser tool is available (Playwright MCP, or a built-in browser). None → stop: "QA
+    needs a browser tool. Run `claude mcp add playwright npx @playwright/mcp@latest`, then
+    restart."
+  - `Dev sign-in` in `## anu` is not `none yet`. Else → stop: "QA cannot sign in. Run
+    /anu:setup to add a dev sign-in route."
+
+  Go on without either only if the user says so; the PR then lists what was not checked.
 
 ## 1. Study and plan — you, before anyone is spawned
 
 Find the task and its state.json by exact ID, and carry on from `stage`:
 - `null` → /anu:study (checks the blockers are merged, makes the worktree), then plan.
-- `studied` → /anu:plan. The plan needs two slices with no file in common and the shared
-  interfaces written out. Do not wait for an OK: go straight on to step 2.
+- `studied` → /anu:plan. The plan needs its slices: two with no file in common and the shared
+  interfaces written out, or one for a task too small to split. Do not wait for an OK: go
+  straight on to step 2.
 - `planned` → step 2. `made` → step 5. `submitted` → hand over to /anu:resume.
 
 ## 2. Start the local stack
@@ -35,9 +44,10 @@ one another session started (check `lsof -a -p <pid> -d cwd`).
 
 Create the shared tasks with their dependencies:
 - `stack` → you (step 2)
-- `slice-a`, `slice-b` → `anu:senior-dev` named `dev-a` and `dev-b`, blocked by `stack`
-- `qa` → `anu:qa-engineer` named `qa`, blocked by both slices
-- `security` → `anu:security-engineer` named `security`, blocked by both slices
+- one task per slice in the plan: `slice-a` → `anu:senior-dev` named `dev-a`, and `slice-b` →
+  `dev-b` when the plan has two. Each is blocked by `stack`. Never spawn a dev with no slice.
+- `qa` → `anu:qa-engineer` named `qa`, blocked by every slice
+- `security` → `anu:security-engineer` named `security`, blocked by every slice
 - `land` → you, blocked by `qa` and `security`
 
 Spawn by agent type and never name a model: each definition sets its own. Spawn them as an agent
@@ -45,7 +55,8 @@ team, as teammates. If a spawn gives plain subagents instead, spawn again and sa
 team".
 
 Teammates do not see this conversation. Every spawn prompt carries:
-- the task ID, the worktree path, and the paths of the task file, `study.md` and `plan.md`;
+- the task ID, the worktree path (and the worktree of each of `Other repos` the plan changes),
+  and the paths of the task file, `study.md` and `plan.md`;
 - its slice, the exact files it owns, and the shared interfaces verbatim;
 - the `## anu` facts it needs: checks, local stack URL and ports, dev sign-in URL and users,
   screen sizes, themes;

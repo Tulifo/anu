@@ -22,7 +22,7 @@ flowchart TD
     DPR -->|you merge| T
     subgraph Build ["Build: one branch task/ID-slug, one PR per repo"]
         T["Study"] --> P["Plan"]
-        P --> M["Make: two devs, or you alone"]
+        P --> M["Make: the devs, or you alone"]
         M --> Q["QA in the running app"]
         M --> S["Security review of the diff"]
         Q --> SUB["Submit"]
@@ -53,13 +53,16 @@ Some things are not decisions but problems, and they still stop:
 | A task in `Blocked by` has no merged PR | building on unmerged work builds on something that may change |
 | The task's design PR is not merged | the brief, sketches or task may still change |
 | A screen has no sketch file under `docs/sketches/` | a screen is never designed from prose alone |
-| The worktree or branch differs from `state.json` | anu may be about to work in the wrong place |
+| The branch differs from `state.json` | anu may be about to work in the wrong place |
+| No browser tool, or no dev sign-in route | QA could not see the app or get past the login; asked once, at the start |
 | A rebase conflict whose intent is unclear | only you know which side is right |
 | `git config user.name` is empty | commits must carry your identity; anu asks for it once |
 | Anything destructive or outside the local stack | a deploy, a real third-party service, production data, billing |
 
 The last question anu asks is after the PR is open: was anything about anu friction, confusing,
-or worth changing. Your answer goes into the PR under `## anu feedback`.
+or worth changing. Your answer goes into the PR under `## anu feedback`. If it asks for a change
+to anu, anu says where to open an issue; it never files one itself, because your words may
+carry details of your app.
 
 ## Stages and `state.json`
 
@@ -72,11 +75,13 @@ Every task keeps its notes in `docs/work-notes/<ID>/` on its own branch. `state.
   "file": "docs/tasks/CS-14-invite-member.md",
   "stage": "planned",
   "branch": "task/CS-14-invite-member",
-  "worktree": "/Users/you/app/.claude/worktrees/CS-14",
   "pr": [],
   "updated": "2026-11-16"
 }
 ```
+
+No path is stored. The worktree is found by its branch (`git worktree list`), so the notes work
+on any machine and for any teammate.
 
 | `stage` | Means | Next |
 |---|---|---|
@@ -88,12 +93,14 @@ Every task keeps its notes in `docs/work-notes/<ID>/` on its own branch. `state.
 | `merged` | every PR merged | done; remove the worktree |
 
 Any step started too early runs the step before it first, instead of sending you back.
-`/anu:resume` reads the stage and runs the next step.
+`/anu:resume <ID>` reads the stage and runs the next step. `/anu:resume <feature>` does the same
+for a design branch: it carries on from the first missing step, or answers the PR's review.
 
 ## Branches and worktrees
 
-All work happens in a git worktree on a branch off `origin/main`. anu never commits to `main`,
-never switches the main checkout's branch, and never uses `git stash` (one stash is shared by
+All work happens in a git worktree on a branch off the app's **base branch**: the `Base branch`
+key in `## anu`, or `main` when the key is absent. This page writes it `origin/<base>`. anu
+never commits to the base branch, never switches the main checkout's branch, and never uses `git stash` (one stash is shared by
 every worktree of a repo, so a stash in one session can be popped in another).
 
 | Work | Branch | Worktree |
@@ -109,13 +116,17 @@ checks three things first:
 1. it is a **linked worktree**: `.git` at its root is a file, not a folder
    (`test -f "$(git rev-parse --show-toplevel)/.git"`). In the main checkout `.git` is a folder,
    so the main checkout's branch is never renamed;
-2. it has no commits beyond `origin/main`;
+2. it has no commits beyond `origin/<base>`;
 3. it has nothing uncommitted.
 
 Then it renames the branch with `git branch -m`. Otherwise it runs `git worktree add`.
 
 This is what lets you run two or three sessions on one repo at once: each works in its own
 folder on its own branch.
+
+A task that changes one of `Other repos` gets a worktree in that repo too, on the same branch
+name and off that repo's own base branch. `/anu:plan` makes it, once the plan shows the repo is
+touched.
 
 ## Task IDs
 
@@ -130,12 +141,13 @@ Next: CS-17
 - CS-14 Invite a member — docs/tasks/CS-14-invite-member.md
 ```
 
-- `/anu:tasks` rebases onto `origin/main`, reads `Next:`, takes the IDs from there, moves the
+- `/anu:tasks` rebases onto `origin/<base>`, reads `Next:`, takes the IDs from there, moves the
   line on, and commits that change on its own before writing any task file. It never takes an ID
   from file names.
 - If the rebase before the PR conflicts on the `Next:` line, someone else took those IDs first.
   anu keeps their line, renumbers its own tasks from their `Next:` value (file names, IDs inside
-  the files, every `Blocked by`, the `## Coming` lines, the brief's links) and carries on.
+  the files, every `Blocked by`, the `## Coming` lines, the brief's links) and carries on. If the clash shows only after the PR
+  is open, `/anu:resume <feature>` does the same and pushes with `--force-with-lease`.
 - IDs always match exactly. `CS-4` finds `CS-4-invite.md` and `task/CS-4-…`, never `CS-41-…`.
 - Notes are found by the ID folder `docs/work-notes/<ID>/`, never by date.
 
@@ -169,7 +181,7 @@ LESSONS.md                                what broke before and must not break a
 - Commits carry the developer's own git identity only. No AI co-author trailer, no "generated
   with" line.
 - Files are added by name, never `git add -A`.
-- Before every push: `git fetch origin` and `git rebase origin/main`; checks run again if the
+- Before every push: `git fetch origin` and `git rebase origin/<base>`; checks run again if the
   rebase brought new commits.
 - PR bodies are written to a temp file and passed with `--body-file`, so backticks survive.
 - A task that changes more than one repo gets one PR per repo, each linking the others under

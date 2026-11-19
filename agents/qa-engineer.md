@@ -38,7 +38,8 @@ come from the `## anu` section of the repo's CLAUDE.md and from your brief.
 ## Boundaries
 
 - Read, run and observe only: no edits (not through Bash either: no `>` into a file, no `sed -i`,
-  `rm` or `mv`), no commits, no branch changes, no `git stash`.
+  `rm` or `mv`), no commits, no branch changes, no `git stash`. anu's hook refuses such a command; do not
+  work around it.
 - Do not fix defects yourself, even one-liners: file them to the owner.
 
 ## Report

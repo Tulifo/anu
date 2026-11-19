@@ -47,8 +47,8 @@ Open Claude Code in the app repo and run:
 
 What happens:
 
-1. anu makes a worktree on branch `anu/setup` off `origin/main`. Your main checkout is not
-   touched.
+1. anu makes a worktree on branch `anu/setup` off the repo's default branch. Your main checkout
+   is not touched.
 2. It reads the repo to find each fact itself: the stack from `package.json` and friends, the
    check commands from scripts and CI, the local stack from dev scripts and docker-compose, a dev
    sign-in route, breakpoints, themes, the styles file.
@@ -87,8 +87,9 @@ times:
 At the end it opens one PR holding the brief, the sketches and the task files, and tells you the
 task IDs, for example `CS-14`, `CS-15`, `CS-16`.
 
-Review and merge the design PR. Tasks are built from `origin/main`: anu stops and asks before
-building a task whose design PR is not merged yet.
+Review and merge the design PR. Tasks are built from the base branch on the remote
+(`origin/main` in most repos): anu stops and asks before building a task whose design PR is not
+merged yet.
 
 ## 4. Build a task with the team
 
@@ -109,12 +110,14 @@ The tech lead:
 1. finds the task by its exact ID and checks every task in `Blocked by` has a **merged** PR;
 2. makes a worktree on `task/CS-14-<slug>` and reads the task, the brief, the sketches and the
    code it touches (`study.md`);
-3. writes the plan: two slices with no file in common and the interfaces they share
-   (`plan.md`). It does not wait for an OK;
-4. starts the local stack and spawns the team: two senior devs (one slice each), QA and
-   security;
+3. writes the plan: two slices with no file in common and the interfaces they share, or one
+   slice for a small task (`plan.md`). It does not wait for an OK;
+4. starts the local stack and spawns the team: a senior dev per slice, QA and security;
 5. gates each slice on green checks, QA in the running app and a clean security review;
-6. commits, rebases onto `origin/main`, pushes and opens the PR.
+6. commits, rebases onto the base branch, pushes and opens the PR.
+
+Before any of this it checks QA can work: a browser tool is there, and `## anu` has a dev
+sign-in route. If not, it stops at the start and says how to fix it.
 
 You get one status line each time a part of the work changes state, and no questions in between.
 Calls it had to make are listed under "Decisions taken" in the PR.
@@ -152,6 +155,7 @@ it opens the PR, so the code is never signed off by whoever wrote it.
 | Design a feature | `/anu:idea "<idea>"` |
 | Build the next task | `claude --agent anu:tech-lead`, then `/anu:build <ID>` |
 | Pick up a task a session left | `/anu:resume <ID>` |
+| Pick up a design, or answer its PR review | `/anu:resume <feature>` |
 | Record a bug that must not come back | `/anu:lessons` |
 | See what is next | open `docs/todo.md` |
 

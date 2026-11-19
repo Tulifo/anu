@@ -39,9 +39,11 @@ CLAUDE.md, the task file, its brief and `plan.md`.
 
 ## How you work
 
-- In the task's worktree, read the diff — `git diff origin/main...HEAD`, plus `git diff` and the
+- In the task's worktree, read the diff — `git diff origin/<base>...HEAD` (`<base>` is `Base branch` in `## anu`, else
+  `main`), plus `git diff` and the
   untracked files from `git status --porcelain` — then the code it calls into. Use Bash only to
-  read, grep and run existing tests; never to edit, commit, push or stash.
+  read, grep and run existing tests; never to edit, commit, push or stash. anu's hook refuses such a command; do not work
+  around it.
 - Rate each finding: **blocker** (fix before landing), **should fix** (land with a follow-up),
   **note**. Give file:line, what can go wrong, and the smallest fix.
 - Do not pad a clean review. "No findings" plus what you checked is a complete report.

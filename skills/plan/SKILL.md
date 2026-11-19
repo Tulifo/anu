@@ -1,6 +1,6 @@
 ---
 name: plan
-description: List the changes a task needs, file by file and in order, split them into two slices with separate files and the interfaces they share, and say how each acceptance line will be checked — then carry on without waiting for an OK. Writes docs/work-notes/<ID>/plan.md. Use for /anu:plan CS-14, or inside /anu:build.
+description: List the changes a task needs, file by file and in order, split them into two slices (one for a small task) with separate files and the interfaces they share, and say how each acceptance line will be checked — then carry on without waiting for an OK. Writes docs/work-notes/<ID>/plan.md. Use for /anu:plan CS-14, or inside /anu:build.
 argument-hint: "<task ID>"
 ---
 
@@ -36,9 +36,10 @@ Two slices with no file in common; usually the screen (A) and the server and dat
 | A — <screen> | dev-a | `<path>` |
 | B — <server, data> | dev-b | `<path>` |
 A shared file (a router, an index, package.json) belongs to one slice; the other asks its owner.
+A task too small to split has one slice, owned by dev-a: say why in one line.
 
 ## Shared interfaces
-Copied verbatim to both builders:
+Copied verbatim to every builder ("none" for a one-slice plan):
 - `<METHOD /path or function>`: input <shape>, output <shape>, errors <codes>
 - Data: `<table or collection>` fields <name: type>
 - Routes and events: <names>
@@ -61,8 +62,14 @@ component's defaults (width, padding, size).
 - <decision> — <why>
 ```
 
-A small task may have one slice; say why. A screen with no sketch file under `docs/sketches/` is
-not designed: stop and say so; never plan its look from prose alone.
+A screen with no sketch file under `docs/sketches/` is not designed: stop and say so; never plan
+its look from prose alone.
+
+A change in one of `Other repos` from `## anu`: write its paths as `<repo>:<path>`, and make that
+repo's worktree before you finish. From its local path: `git fetch origin`, then
+`git worktree add -b task/<ID>-<slug> .claude/worktrees/<ID> origin/<its base>` — its base is its
+own `Base branch`, else `git symbolic-ref --short refs/remotes/origin/HEAD`. The branch name is
+the same in every repo. Never touch that repo's main checkout.
 
 ## 2. Show it and carry on
 
